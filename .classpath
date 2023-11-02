@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-17">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" path="given.threads.channels"/>
+	<classpathentry kind="src" path="solved.threads.channels"/>
+	<classpathentry kind="src" path="given.threads.queues"/>
+	<classpathentry kind="src" path="solved.threads.queues"/>
+	<classpathentry kind="src" path="given.events.queues"/>
+	<classpathentry kind="src" path="solved.events.queues"/>
+	<classpathentry kind="src" path="given.utils"/>
+	<classpathentry kind="src" path="solved.utils"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
