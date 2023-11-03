@@ -41,29 +41,24 @@ public class CMessageQueue extends MessageQueue {
 
     @Override
     public byte[] receive() throws ClosedException {
-        byte[] bytes = new byte[1];
-        int length;
-		try {
-			length = channel.read(bytes, 0, 1);
-		} catch (DisconnectedException e) {
-			// TODO Auto-generated catch block
-			throw new ClosedException();
-		}
-        bytes = new byte[length];
+        byte[] lengthBytes = new byte[1];
+        try {
+            channel.read(lengthBytes, 0, 1);
+        } catch (DisconnectedException e) {
+            throw new ClosedException();
+        }
+        int length = lengthBytes[0];
+        byte[] bytes = new byte[length];
         int offset = 0;
         try {
-        while (length > 0) {
-            int received;
-			
-				received = channel.read(bytes, offset, length);
-			
-            offset += received;
-            length -= received;
-        }
+            while (length > 0) {
+                int received = channel.read(bytes, offset, length);
+                offset += received;
+                length -= received;
+            }
         } catch (DisconnectedException e) {
-			// TODO Auto-generated catch block
-			throw new ClosedException();
-		}
+            throw new ClosedException();
+        }
         return bytes;
     }
 

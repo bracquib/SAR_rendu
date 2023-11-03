@@ -78,11 +78,13 @@ public class TestClient implements Runnable {
       byte bytes[];
       bytes = queue.receive();
       log(name + ":Reader: read " + bytes.length + " bytes");
-      for (int i = 0; i < bytes.length; i++)
+      for (int i = 0; i < bytes.length; i++) {
         if (bytes[i] != (byte) (offset+i)) {
-          log("byte"+bytes[i]+ "offset"+ offset+i);
+          log("erreur:byte"+bytes[i]+ " offset"+ offset+i);
           throw new Error();
+    
         }
+      }
       log(name + ":Reader: done");
       offset+=bytes.length;
     }
