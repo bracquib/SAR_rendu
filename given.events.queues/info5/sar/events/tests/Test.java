@@ -69,7 +69,7 @@ public class Test {
   }
 
   static String ChannelBrokerClassName = "info5.sar.channels.CBroker";
-  static String QueueBrokerClassName = "info5.sar.events.queues.CQueueBroker";
+  static String QueueBrokerClassName = "info5.sar.mixed.queues.CQueueBroker";
   static final String CBROKER_OPTION = "-cbroker:";
   static final String QBROKER_OPTION = "-qbroker:";
   static final String NCLIENTS_OPTION = "-nclients:";

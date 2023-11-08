@@ -60,9 +60,12 @@ public class ServerWorker implements MessageQueue.Listener {
   @Override
   public void received(byte[] msg) {
     Executor.check();
+    System.out.println("ServerWorker:received: " + msg.length + " bytes");
     m_msgs.add(msg);
-    if (m_msgs.size() == 1)
+    if (m_msgs.size() == 1){
       m_pump.post(m_echoer);
+      System.out.println("ServerWorker:received: posted echoer");
+    }
   }
 
   @Override

@@ -55,6 +55,7 @@ public class Server implements Runnable {
   private class _AcceptListener implements AcceptListener {
     @Override
     public void accepted(MessageQueue queue) {
+      System.out.println("Server: accepted connection from " + queue.getRemoteName());
       new ServerWorker(queue);
     }
   }
@@ -66,6 +67,7 @@ public class Server implements Runnable {
   @Override
   public void run() {
     System.out.println("Server started!");
+    System.out.println("Server: binding port " + port);
     broker.bind(port, new _AcceptListener());
   }
 

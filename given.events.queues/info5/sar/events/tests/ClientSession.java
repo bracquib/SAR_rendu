@@ -109,12 +109,12 @@ public class ClientSession implements Runnable, QueueBroker.ConnectListener {
   public void connected(MessageQueue queue) {
     QueueBroker broker = m_tc.broker();
     Executor pump = broker.getEventPump();
-
+    System.out.println("utilise connected de ClientSession");
     m_queue = queue;
     m_reader = new _Reader(m_offset, m_length);
     queue.setListener(m_reader);
     m_writer = new _Writer(pump, m_offset, m_length, m_msize);
-
+    System.out.println(m_writer + " connected.");
     // this will start the sending of messages.
     pump.post(m_writer);
   }
@@ -165,6 +165,7 @@ public class ClientSession implements Runnable, QueueBroker.ConnectListener {
     @Override
     public void received(byte[] bytes) {
       Executor.check();
+      System.out.println(m_name + " received " + bytes.length + " bytes");
       Message msg = new Message(m_seqno++, bytes);
       int size = msg.check(m_name, m_pos);
       m_pos += size;

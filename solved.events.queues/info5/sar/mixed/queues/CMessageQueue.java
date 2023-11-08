@@ -16,6 +16,7 @@
  */
 package info5.sar.mixed.queues;
 
+import info5.sar.events.channels.Channel;
 import info5.sar.events.queues.MessageQueue;
 import info5.sar.events.queues.QueueBroker;
 
@@ -24,35 +25,62 @@ import info5.sar.events.queues.QueueBroker;
  * event-oriented queues with threaded channels.
  */
 public class CMessageQueue extends MessageQueue {
+	 private Thread workerReader;
+    private Thread workerWriter;
+    private QueueBroker queueBroker;
+    private final info5.sar.channels.Channel channel;
+    private Listener listener;
+    private boolean isClosed = false;
 
+    public CMessageQueue(QueueBroker broker, info5.sar.channels.Channel channel2) {
+        this.channel = channel2;
+        this.queueBroker = broker;
+    }
   @Override
   public QueueBroker broker() {
-    throw new RuntimeException("Not Implemented Yet");
+    return this.queueBroker;
   }
 
   @Override
   public void setListener(Listener l) {
-    throw new RuntimeException("Not Implemented Yet");
+    this.listener = l;
   }
 
   @Override
   public boolean send(byte[] bytes) {
-    throw new RuntimeException("Not Implemented Yet");
+  System.out.println("send: " + bytes.length);
+    if (this.isClosed) {
+      return false;
+    }
+    System.out.println("send rentre dans le thread");
+    this.workerWriter = new Thread(() -> {
+      try {
+        this.channel.write(bytes, 0, bytes.length);
+        System.out.println("write: " + bytes.length);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    });
+    this.workerWriter.start();
+    return true;
   }
 
   @Override
   public void close() {
-    throw new RuntimeException("Not Implemented Yet");
+    System.out.println("close");
+    this.isClosed = true;
+    this.workerReader.interrupt();
+    this.workerWriter.interrupt();
   }
 
   @Override
   public boolean closed() {
-    throw new RuntimeException("Not Implemented Yet");
+    return this.isClosed;
   }
 
   @Override
   public String getRemoteName() {
-    throw new RuntimeException("Not Implemented Yet");
+    return this.channel.getRemoteName();
   }
 
 }

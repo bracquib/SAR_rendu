@@ -20,8 +20,8 @@ import info5.sar.channels.Broker;
 import info5.sar.utils.Executor;
 
 public abstract class QueueBroker {
-  private Broker broker;
-  private Executor pump;
+  public Broker broker;
+  protected Executor pump;
   public QueueBroker(Executor pump, Broker broker) {
     this.broker = broker;
     this.pump = pump;
