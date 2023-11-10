@@ -36,28 +36,52 @@ private Thread workerBind;
     System.out.println("CQueueBroker");
   }
 
-
+/*
    @Override
     public boolean bind(int port, AcceptListener listener) {
         System.out.println("bind");
         if (listener == null) {
             return false;
         }
+        while (isRunning) {
+        if (CQueueBroker.this.broker.isPortUsed(port)){
+            System.out.println("refused from bind");
+            return false; 
+        }
         workerBind = new Thread(() -> {
     System.out.println("workerBind thread started");
-    while (isRunning) {
-        System.out.println("isRunning:" + isRunning);                
-        if (CQueueBroker.this.broker.accept(port) != null) {
-            System.out.println("refused from bind");
-            continue;   
-        } else {
-            System.out.println("accepted from bind");
             this.pump.post(() -> {
                 System.out.println("before listener.accepted");
                 listener.accepted(new CMessageQueue(CQueueBroker.this, CQueueBroker.this.broker.accept(port)));
                 System.out.println("after listener.accepted");
             });
+});
+        workerBind.start();
+        System.out.println("création thread");
         }
+        System.out.println("bind end");
+        return true;
+    }*/
+
+      @Override
+    public boolean bind(int port, AcceptListener listener) {
+        System.out.println("bind");
+        if (listener == null) {
+            return false;
+        }
+        if (this.broker.isPortUsed(port)){
+           return false; 
+        }
+        workerBind = new Thread(() -> {
+    System.out.println("workerBind thread started");
+    while (isRunning) {
+    	info5.sar.channels.Channel channel = this.broker.accept(port);
+            this.pump.post(() -> {
+                System.out.println("before listener.accepted");
+                listener.accepted(new CMessageQueue(this, channel));
+                System.out.println("after listener.accepted");
+            });
+        
     }
     System.out.println("workerBind thread ended");
 });
@@ -81,13 +105,17 @@ private Thread workerBind;
             return false;
         }
         workerConnect = new Thread(() -> {
-            info5.sar.channels.Channel queue = CQueueBroker.this.broker.connect(name, port);
-            if (queue == null) {
+            if (this.broker.isPortUsed(port)){
                 System.out.println("refused from connect");
                 this.pump.post(listener::refused);
             } else {
                 System.out.println("connect from connect");
-                this.pump.post(() -> listener.connected(new CMessageQueue(CQueueBroker.this, queue)));
+            	info5.sar.channels.Channel channel = this.broker.connect(name, port);
+                this.pump.post(() ->  {
+                    System.out.println("before listener.connected");
+                    listener.connected(new CMessageQueue(this,channel ));
+                    System.out.println("after listener.connected");
+                });
             }
         });
         workerConnect.start();

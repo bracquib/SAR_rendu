@@ -70,5 +70,7 @@ public class CBroker extends Broker {
 
         return channel;
     }
-
+    public boolean isPortUsed(int port) {
+        return rdv.isPortUsed(port);
+    }
 }

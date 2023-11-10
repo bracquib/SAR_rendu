@@ -40,7 +40,8 @@ public abstract class Broker {
    * @returns the name of this broker.
    */
   public String getName() { return name; }
-  
+  public abstract boolean isPortUsed(int port) ;
+	    
   /*
    * Indicate that this broker will accept one connection
    * on the given port and return a fully connected channel.

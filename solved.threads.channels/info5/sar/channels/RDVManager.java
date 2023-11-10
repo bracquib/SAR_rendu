@@ -51,6 +51,12 @@ public class RDVManager {
         }
     }
 
+    public boolean isPortUsed(int port) {
+    synchronized (connectionByPort) {
+        return connectionByPort.get(port) != null;
+    }
+}
+
     /*
      * This class is a rendez-vous It wait for at least one connect and one accept
      * for the execution to continue on both sides. If multiple connect are waiting,
