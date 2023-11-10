@@ -71,7 +71,7 @@ public class CMessageQueue extends MessageQueue {
     this.workerReader = new Thread(() -> {
         while (!Thread.currentThread().isInterrupted()) {
             try {
-                byte[] bytes = new byte[1024];
+                byte[] bytes = new byte[400];
                 int read = this.channel.read(bytes, 0, bytes.length);
                 if (read > 0) {
                     if (this.listener != null) {
