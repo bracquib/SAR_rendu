@@ -16,9 +16,13 @@
  */
 package info5.sar.mixed.queues;
 
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
 import info5.sar.events.channels.Channel;
 import info5.sar.events.queues.MessageQueue;
 import info5.sar.events.queues.QueueBroker;
+import info5.sar.utils.Executor;
 
 /**
  * This is for the mixed implementation, mixing
@@ -32,10 +36,30 @@ public class CMessageQueue extends MessageQueue {
     private Listener listener;
     private boolean isClosed = false;
 
-    public CMessageQueue(QueueBroker broker, info5.sar.channels.Channel channel2) {
+    private BlockingQueue<byte[]> queue;
+
+    private final Executor pump;
+
+
+    public CMessageQueue(QueueBroker broker, info5.sar.channels.Channel channel2, Executor pump) {
         this.channel = channel2;
         this.queueBroker = broker;
+        this.queue = new LinkedBlockingQueue<>();
+        this.pump = pump;
+        this.workerWriter = new Thread(() -> {
+                try {
+                    byte[] bytes = queue.take();
+                    this.channel.write(bytes, 0, bytes.length);
+                    System.out.println("write: " + bytes.length);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+           
+        });
+        this.workerWriter.start();
+            
     }
+
   @Override
   public QueueBroker broker() {
     return this.queueBroker;
@@ -44,26 +68,37 @@ public class CMessageQueue extends MessageQueue {
   @Override
   public void setListener(Listener l) {
     this.listener = l;
+    this.workerReader = new Thread(() -> {
+        while (!Thread.currentThread().isInterrupted()) {
+            try {
+                byte[] bytes = new byte[1024];
+                int read = this.channel.read(bytes, 0, bytes.length);
+                if (read > 0) {
+                    if (this.listener != null) {
+                        this.pump.post(() -> this.listener.received(bytes));
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    });
+    this.workerReader.start();
   }
 
   @Override
-  public boolean send(byte[] bytes) {
-  System.out.println("send: " + bytes.length);
-    if (this.isClosed) {
-      return false;
+    public boolean send(byte[] bytes) {
+        if (this.isClosed) {
+            return false;
+        }
+        try {
+            this.queue.put(bytes);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
-    System.out.println("send rentre dans le thread");
-    this.workerWriter = new Thread(() -> {
-      try {
-        this.channel.write(bytes, 0, bytes.length);
-        System.out.println("write: " + bytes.length);
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    });
-    this.workerWriter.start();
-    return true;
-  }
 
   @Override
   public void close() {

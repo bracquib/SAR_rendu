@@ -78,7 +78,7 @@ private Thread workerBind;
     	info5.sar.channels.Channel channel = this.broker.accept(port);
             this.pump.post(() -> {
                 System.out.println("before listener.accepted");
-                listener.accepted(new CMessageQueue(this, channel));
+                listener.accepted(new CMessageQueue(this, channel, this.pump));
                 System.out.println("after listener.accepted");
             });
         
@@ -113,7 +113,7 @@ private Thread workerBind;
             	info5.sar.channels.Channel channel = this.broker.connect(name, port);
                 this.pump.post(() ->  {
                     System.out.println("before listener.connected");
-                    listener.connected(new CMessageQueue(this,channel ));
+                    listener.connected(new CMessageQueue(this,channel, this.pump));
                     System.out.println("after listener.connected");
                 });
             }

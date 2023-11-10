@@ -114,6 +114,7 @@ public class ClientSession implements Runnable, QueueBroker.ConnectListener {
     m_reader = new _Reader(m_offset, m_length);
     queue.setListener(m_reader);
     m_writer = new _Writer(pump, m_offset, m_length, m_msize);
+    m_writer.dump(System.out);
     System.out.println(m_writer + " connected.");
     // this will start the sending of messages.
     pump.post(m_writer);
