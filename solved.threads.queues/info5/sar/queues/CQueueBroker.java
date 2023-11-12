@@ -1,6 +1,8 @@
 package info5.sar.queues;
 
 import info5.sar.channels.Broker;
+import info5.sar.utils.AcceptListener;
+import info5.sar.utils.ConnectListener;
 
 public class CQueueBroker extends QueueBroker {
     public CQueueBroker(Broker broker) {

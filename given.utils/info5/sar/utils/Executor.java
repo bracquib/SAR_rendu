@@ -36,7 +36,6 @@ public class Executor extends Thread {
         r = queue.remove(0);
       }
       r.run();
-      System.out.println("nouveau run dans executor");
     }
   }
 

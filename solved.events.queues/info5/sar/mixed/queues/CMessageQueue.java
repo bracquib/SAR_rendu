@@ -52,7 +52,7 @@ public class CMessageQueue extends MessageQueue {
                     this.channel.write(bytes, 0, bytes.length);
                     System.out.println("write: " + bytes.length);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    // nothing to do here
                 }
            
         });
@@ -79,7 +79,7 @@ public class CMessageQueue extends MessageQueue {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+               // nothing to do here
             }
         }
     });
@@ -94,8 +94,8 @@ public class CMessageQueue extends MessageQueue {
         try {
             this.queue.put(bytes);
         } catch (InterruptedException e) {
-            e.printStackTrace();
-            return false;
+            // nothing to do here
+            
         }
         return true;
     }
@@ -103,9 +103,15 @@ public class CMessageQueue extends MessageQueue {
   @Override
   public void close() {
     System.out.println("close");
-    this.isClosed = true;
-    this.workerReader.interrupt();
-    this.workerWriter.interrupt();
+   /* 
+    * Si on garde cela et qu'on enlève listener.closed ,on a qu'un seul done pour chaque client.
+    * this.isClosed = true;
+    * this.workerReader.interrupt();
+    * this.workerWriter.interrupt();
+    */
+    if (this.listener != null) {
+        this.pump.post(() -> this.listener.closed());
+    }
   }
 
   @Override

@@ -3,15 +3,13 @@
  */
 
 package info5.sar.channels;
-
-import java.util.Dictionary;
 import java.util.Hashtable;
 
 import info5.sar.utils.BrokerManager;
 public class CBroker extends Broker {
 
     private static final BrokerManager<CBroker> brokerManager = BrokerManager.getInstance(CBroker.class);
-    Dictionary<Integer, CChannel> waitingChannelByPort;
+    Hashtable<Integer, CChannel> waitingChannelByPort;
     RDVManager rdv = new RDVManager();
 
     public CBroker(String name) {

@@ -16,6 +16,10 @@
  */
 package info5.sar.events.channels;
 
+import info5.sar.channels.DisconnectedException;
+import info5.sar.events.channel.CChannel;
+import info5.sar.utils.Listener;
+
 /**
  *==================================================================== 
  * This is a place-holder class for fully event-oriented channels.
@@ -28,9 +32,15 @@ package info5.sar.events.channels;
  */
 public abstract class Channel {
   Broker broker;
+  CChannel linkedChannel;
 
   protected Channel(Broker broker) {
     this.broker = broker;
+  }
+
+  protected Channel(Broker broker, CChannel c) {
+    this.broker = broker;
+    linkedChannel = c;
   }
 
   // added for helping debugging applications.
@@ -39,5 +49,17 @@ public abstract class Channel {
   public Broker getBroker() {
     return broker;
   }
+
+
+  public abstract void close();
+
+  public abstract boolean closed();
+
+public abstract void setListener(Listener l);
+
+
+public abstract int send(byte b) throws DisconnectedException ;
+
+
 
 }

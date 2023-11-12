@@ -16,6 +16,11 @@
  */
 package info5.sar.events.channels;
 
+
+import info5.sar.utils.AcceptListener;
+import info5.sar.utils.ConnectListener;
+import info5.sar.utils.Executor;
+
 /**
  *==================================================================== 
  * This is a place-holder class for fully event-oriented broker
@@ -29,17 +34,41 @@ package info5.sar.events.channels;
  */
 public abstract class Broker {
   String name;
+  Executor pump;
   /* 
+    * Creates a new broker with the given name and executor.
+    * The executor is used to run the broker's threads.
+    * @param name the name of the broker.
+    * @param executor the executor to run the broker's threads.
    * Each broker must be uniquely named. 
    * @throws IllegalArgumentException if the name is not unique.
    */
-  protected Broker(String name) {
+  protected Broker(String name, Executor executor){
     this.name = name;
+    this.pump = executor;
+
   }
   
   /*
    * @returns the name of this broker.
    */
   public String getName() { return name; }
+
+  /*
+   * @returns a channel connected to the given port.
+   * @throws IllegalArgumentException if the port is already used.
+   */
+  public abstract boolean accept(int port, AcceptListener listener);
+
+  /*
+   * @returns a channel connected to the given port on the given broker.
+   * @throws IllegalArgumentException if the port is already used.
+   */
+  public abstract boolean connect(String name, int port, ConnectListener listener);
   
+  
+  public Executor getPump() {
+		return pump;
+	}
+
 }

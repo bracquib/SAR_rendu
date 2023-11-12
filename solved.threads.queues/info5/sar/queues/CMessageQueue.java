@@ -2,6 +2,8 @@ package info5.sar.queues;
 
 import info5.sar.channels.Channel;
 import info5.sar.channels.DisconnectedException;
+import info5.sar.utils.Listener;
+
 import static info5.sar.utils.Log.log;
 public class CMessageQueue extends MessageQueue {
     private final Channel channel;
@@ -73,7 +75,7 @@ public class CMessageQueue extends MessageQueue {
     }
 
     @Override
-    public void addListener(MessageQueueListener listener) {
+    public void addListener(Listener listener) {
         throw new UnsupportedOperationException();
     }
 

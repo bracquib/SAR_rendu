@@ -36,32 +36,7 @@ private Thread workerBind;
     System.out.println("CQueueBroker");
   }
 
-/*
-   @Override
-    public boolean bind(int port, AcceptListener listener) {
-        System.out.println("bind");
-        if (listener == null) {
-            return false;
-        }
-        while (isRunning) {
-        if (CQueueBroker.this.broker.isPortUsed(port)){
-            System.out.println("refused from bind");
-            return false; 
-        }
-        workerBind = new Thread(() -> {
-    System.out.println("workerBind thread started");
-            this.pump.post(() -> {
-                System.out.println("before listener.accepted");
-                listener.accepted(new CMessageQueue(CQueueBroker.this, CQueueBroker.this.broker.accept(port)));
-                System.out.println("after listener.accepted");
-            });
-});
-        workerBind.start();
-        System.out.println("création thread");
-        }
-        System.out.println("bind end");
-        return true;
-    }*/
+
 
       @Override
     public boolean bind(int port, AcceptListener listener) {
@@ -93,6 +68,7 @@ private Thread workerBind;
 @Override
     public boolean unbind(int port) {
         isRunning = false;
+        this.workerBind.interrupt();
         return true;
     }
 

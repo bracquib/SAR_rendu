@@ -1,6 +1,6 @@
 package info5.sar.queues;
 
-import info5.sar.queues.MessageQueueListener;
+import info5.sar.utils.Listener;
 
 /**
  * A message queue.
@@ -59,7 +59,7 @@ public abstract class MessageQueue {
      *
      * @param listener - the listener
      */
-    public abstract void addListener(MessageQueueListener listener);
+    public abstract void addListener(Listener listener);
 
     /**
      * event-oriented send
