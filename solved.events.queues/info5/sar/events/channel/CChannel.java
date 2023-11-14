@@ -1,77 +1,132 @@
 package info5.sar.events.channel;
 
-import info5.sar.channels.DisconnectedException;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import info5.sar.events.channels.Broker;
 import info5.sar.events.channels.Channel;
-import info5.sar.utils.Listener;
+import info5.sar.queues.ClosedException;
+import info5.sar.utils.CircularBuffer;
+import info5.sar.utils.Executor;
+import info5.sar.utils.WriterReaderListener;
 
 public class CChannel extends Channel {
-public CChannel linkedChannel;
-	private boolean closed;
-	private Listener listener;
+    private CChannel remoteChannel;
+	private boolean closed = true;
+	private CircularBuffer bufferRead = new CircularBuffer(1024);
+	private CircularBuffer bufferWrite = new CircularBuffer(1024);
+
+	private HashMap<String, ArrayList<Runnable>> runnables = new HashMap<>();
+
 
 	public CChannel(Broker broker) {
 		super(broker);
-		linkedChannel = null;
+		runnables.put("read", new ArrayList<Runnable>());
+        runnables.put("write", new ArrayList<Runnable>());	
+		remoteChannel = null;
 		closed = true;
-		listener = null;
 	}
 
-	public CChannel(Broker broker, CChannel c) {
-		super(broker,c);
-		linkedChannel = c;
+	public CChannel(Broker broker, CChannel channel) {
+		super(broker,channel);
+		remoteChannel = channel;
+		bufferRead = channel.bufferWrite;
+		bufferWrite = channel.bufferRead;
+		channel.remoteChannel = this;
+		channel.closed = false;
+		runnables.put("read", new ArrayList<Runnable>());
+        runnables.put("write", new ArrayList<Runnable>());	
 		closed = false;
-		c.linkedChannel = this;
-		c.closed = false;
-		listener = null;
 	}
 
 	@Override
 	public String getRemoteName() {
-		return linkedChannel.getBroker().getName();
+		return remoteChannel.getBroker().getName();
 	}
 
-	@Override
-	public void setListener(Listener l) {
-		listener = l;
+	public CChannel getRemoteChannel() {
+		return remoteChannel;
 	}
+
 
 
 	@Override
 	public void close() {
 		closed = true;
-		Runnable close = new Runnable() {
-			@Override
-			public void run() {
-				listener.closed();
-				linkedChannel.close();
-			}
-		};
-		getBroker().getPump().post(close);
 	}
 
 	@Override
 	public boolean closed() {
 		return closed;
 	}
-	
-	public CChannel getLinkedChannel() {
-		return linkedChannel;
-	}
 
 	@Override
-	public int send(byte b) throws DisconnectedException {
-		if (closed) {
-			throw new DisconnectedException("Disconnected");
+	public boolean write(byte[] bytes, int offset, int length,WriterReaderListener listener) throws ClosedException {
+		if (closed() ) {
+			throw new ClosedException();
 		}
+		if (remoteChannel.closed()){
+			listener.write(length);
+			return true;
+		}
+		
+		Broker broker = getBroker();
+		Executor executor = broker.getExecutor();
 
-		linkedChannel.getBroker().getPump().post(new Runnable() {
+		Runnable write = new Runnable() {
 			@Override
 			public void run() {
-				linkedChannel.listener.received(Byte.valueOf(b));
+				if (bufferWrite.full()) {
+					remoteChannel.runnables.get("write").add(this);
+				}
+				else {
+					int wrote = 0;
+					while (!bufferWrite.full() && wrote < length) {
+						bufferWrite.push(bytes[offset + wrote++]);
+					}
+					listener.write(wrote);
+					while (!runnables.get("read").isEmpty()) {
+						executor.post(runnables.get("read").remove(0));
+					}
+				}
 			}
-		});
-		return b;
+		};
+		executor.post(write);
+		return true;
+	}
+		
 
-}
+	@Override
+	public boolean read(byte[] bytes, int offset, int length,WriterReaderListener listener) throws ClosedException {
+		if (closed() || (remoteChannel.closed() && bufferRead.empty())) {
+			throw new ClosedException();
+		}
+		Broker broker = getBroker();
+		Executor executor = broker.getExecutor();
+
+		Runnable read = new Runnable() {
+			@Override
+			public void run() {
+				if (bufferRead.empty()) {
+					remoteChannel.runnables.get("read").add(this);
+				}
+				else {
+					int read = 0;
+					while (!bufferRead.full() && read < length) {
+						bytes[offset + read++] = bufferRead.pull();
+					}
+					listener.read(read);
+					while (!runnables.get("write").isEmpty()) {
+						executor.post(runnables.get("write").remove(0));
+					}
+				}
+			}
+
+		};
+		executor.post(read);
+		return true;
+	}
+
+		
+				
 }

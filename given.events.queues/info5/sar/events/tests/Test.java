@@ -147,8 +147,8 @@ public class Test {
   /*
    * Default values for the options.
    */
-  private static int nclients = 4;
-  private static int nconnects = 4;
+  private static int nclients = 1;
+  private static int nconnects = 3;
   private static int nbytes = 100;
   private static int msize = 100;
   private static String name = "Server";

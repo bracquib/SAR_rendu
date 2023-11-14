@@ -19,7 +19,7 @@ public class CBroker extends Broker {
         } catch (Exception e) {
             System.out.println(
                     "Could not register Broker " + name + " because another broker with the same name already exist.");
-            e.printStackTrace();
+            
         }
         waitingChannelByPort = new Hashtable<Integer, CChannel>();
     }

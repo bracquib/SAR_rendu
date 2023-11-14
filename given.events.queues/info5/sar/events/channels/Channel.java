@@ -16,9 +16,8 @@
  */
 package info5.sar.events.channels;
 
-import info5.sar.channels.DisconnectedException;
-import info5.sar.events.channel.CChannel;
-import info5.sar.utils.Listener;
+import info5.sar.queues.ClosedException;
+import info5.sar.utils.WriterReaderListener;
 
 /**
  *==================================================================== 
@@ -32,15 +31,13 @@ import info5.sar.utils.Listener;
  */
 public abstract class Channel {
   Broker broker;
-  CChannel linkedChannel;
 
   protected Channel(Broker broker) {
     this.broker = broker;
   }
 
-  protected Channel(Broker broker, CChannel c) {
+  protected Channel(Broker broker, Channel channel) {
     this.broker = broker;
-    linkedChannel = c;
   }
 
   // added for helping debugging applications.
@@ -55,10 +52,11 @@ public abstract class Channel {
 
   public abstract boolean closed();
 
-public abstract void setListener(Listener l);
+
+public abstract boolean write(byte[] bytes, int offset, int length,WriterReaderListener listener) throws ClosedException;
 
 
-public abstract int send(byte b) throws DisconnectedException ;
+public abstract boolean read(byte[] bytes, int offset, int length,WriterReaderListener listener) throws ClosedException;
 
 
 

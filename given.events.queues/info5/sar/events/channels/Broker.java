@@ -34,7 +34,7 @@ import info5.sar.utils.Executor;
  */
 public abstract class Broker {
   String name;
-  Executor pump;
+  Executor executor;
   /* 
     * Creates a new broker with the given name and executor.
     * The executor is used to run the broker's threads.
@@ -45,7 +45,7 @@ public abstract class Broker {
    */
   protected Broker(String name, Executor executor){
     this.name = name;
-    this.pump = executor;
+    this.executor = executor;
 
   }
   
@@ -60,6 +60,7 @@ public abstract class Broker {
    */
   public abstract boolean accept(int port, AcceptListener listener);
 
+  public abstract boolean disconnect(int port);
   /*
    * @returns a channel connected to the given port on the given broker.
    * @throws IllegalArgumentException if the port is already used.
@@ -67,8 +68,8 @@ public abstract class Broker {
   public abstract boolean connect(String name, int port, ConnectListener listener);
   
   
-  public Executor getPump() {
-		return pump;
+  public Executor getExecutor() {
+		return executor;
 	}
 
 }
