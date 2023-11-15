@@ -43,8 +43,8 @@ public class WriterReaderAutomata {
 			public void read(int x) {
 
 				remaining -= x;
-
-				if (state == State.READ_SIZE) {
+				switch(state) {
+				case READ_SIZE :
 					if (remaining > 0) {
 						try {
 							channel.read(buffer, (buffer.length - remaining), remaining, this);
@@ -65,7 +65,8 @@ public class WriterReaderAutomata {
 						}
 
 					}
-				} else if (state == State.READ_CONTENT) {
+					break;
+				case READ_CONTENT :
 					if (remaining > 0) {
 						try {
 							channel.read(buffer, (buffer.length - remaining), remaining, this);
@@ -74,7 +75,6 @@ public class WriterReaderAutomata {
 						}
 
 					} else {
-						System.out.println("Taille du tableau a retourné : " + buffer.length);
 						listener.received(Arrays.copyOf(buffer, buffer.length));
 						buffer = new byte[Integer.BYTES];
 						remaining = Integer.BYTES;
@@ -86,6 +86,9 @@ public class WriterReaderAutomata {
 						}
 
 					}
+					break;
+				default:
+					break;
 
 				}
 			}
@@ -117,8 +120,8 @@ public class WriterReaderAutomata {
 	        @Override
 	        public void write(int writtenBytes) {
 	            remaining -= writtenBytes;
-
-	            if (state == State.WRITE_CONTENT) {
+	            switch(state) {
+	            case WRITE_CONTENT:
 	                if (remaining > 0) {
 	                    try {
 	                        channel.write(bytes, (bytes.length - remaining), remaining, this);
@@ -126,7 +129,8 @@ public class WriterReaderAutomata {
 	                        // Nothing to do here
 	                    }
 	                }
-	            } else if (state == State.WRITE_SIZE) {
+	                break;
+	            case WRITE_SIZE :
 	                if (remaining > 0) {
 	                    try {
 	                        channel.write(buffer4, (Integer.BYTES - remaining), remaining, this);
@@ -142,6 +146,9 @@ public class WriterReaderAutomata {
 	                        // Nothing to do here
 	                    }
 	                }
+	                break;
+				default:
+					break;
 	            }
 	        }
 
