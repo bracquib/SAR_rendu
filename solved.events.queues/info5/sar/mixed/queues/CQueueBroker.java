@@ -19,6 +19,8 @@ package info5.sar.mixed.queues;
 import info5.sar.channels.Broker;
 import info5.sar.events.queues.MessageQueue;
 import info5.sar.events.queues.QueueBroker;
+import info5.sar.utils.AcceptListener;
+import info5.sar.utils.ConnectListener;
 import info5.sar.utils.Executor;
 
 /**
@@ -31,8 +33,8 @@ private Thread workerBind;
     private Thread workerConnect;
     private volatile boolean isRunning = true;
 
-  public CQueueBroker(Executor pump, Broker broker) {
-    super(pump,broker);
+  public CQueueBroker( Broker broker,Executor executor) {
+    super(broker,executor);
     System.out.println("CQueueBroker");
   }
 
@@ -51,9 +53,9 @@ private Thread workerBind;
     System.out.println("workerBind thread started");
     while (isRunning) {
     	info5.sar.channels.Channel channel = this.broker.accept(port);
-            this.pump.post(() -> {
+            this.executor.post(() -> {
                 System.out.println("before listener.accepted");
-                listener.accepted(new CMessageQueue(this, channel, this.pump));
+                listener.accepted(new CMessageQueue(this, channel, this.executor));
                 System.out.println("after listener.accepted");
             });
         
@@ -83,13 +85,13 @@ private Thread workerBind;
         workerConnect = new Thread(() -> {
             if (this.broker.isPortUsed(port)){
                 System.out.println("refused from connect");
-                this.pump.post(listener::refused);
+                this.executor.post(listener::refused);
             } else {
                 System.out.println("connect from connect");
             	info5.sar.channels.Channel channel = this.broker.connect(name, port);
-                this.pump.post(() ->  {
+                this.executor.post(() ->  {
                     System.out.println("before listener.connected");
-                    listener.connected(new CMessageQueue(this,channel, this.pump));
+                    listener.connected(new CMessageQueue(this,channel, this.executor));
                     System.out.println("after listener.connected");
                 });
             }

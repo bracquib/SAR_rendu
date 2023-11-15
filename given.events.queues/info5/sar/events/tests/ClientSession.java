@@ -18,8 +18,11 @@ package info5.sar.events.tests;
 
 import java.io.PrintStream;
 
+import info5.sar.events.channels.Channel;
 import info5.sar.events.queues.MessageQueue;
 import info5.sar.events.queues.QueueBroker;
+import info5.sar.utils.AcceptListener;
+import info5.sar.utils.ConnectListener;
 import info5.sar.utils.Executor;
 import info5.sar.utils.Logger;
 import info5.sar.utils.Panic;
@@ -31,7 +34,7 @@ import info5.sar.utils.Panic;
  * server. Each message is a chunk of a sequence of integers, each integer being
  * encoded over 4 bytes, with the usual network order of bytes.
  */
-public class ClientSession implements Runnable, QueueBroker.ConnectListener {
+public class ClientSession implements Runnable, ConnectListener {
   // this session's name and number
   private String m_name;
   private int m_no;
@@ -278,5 +281,16 @@ public class ClientSession implements Runnable, QueueBroker.ConnectListener {
       }
     }
   }
+
+
+@Override
+public void connected(Channel channel) {
+	// TODO Auto-generated method stub
+	
+}
+
+
+
+
 
 }

@@ -1,7 +1,7 @@
 package info5.sar.utils;
 
 import info5.sar.events.channels.Channel;
-import info5.sar.queues.MessageQueue;
+import info5.sar.events.queues.MessageQueue;
 
 public interface ConnectListener {
 

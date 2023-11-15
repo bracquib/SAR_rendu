@@ -42,7 +42,7 @@ public abstract class Channel {
 
   // added for helping debugging applications.
   public abstract String getRemoteName();
-  
+ 
   public Broker getBroker() {
     return broker;
   }

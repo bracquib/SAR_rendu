@@ -16,9 +16,10 @@
  */
 package info5.sar.events.tests;
 
+import info5.sar.events.channels.Channel;
 import info5.sar.events.queues.MessageQueue;
 import info5.sar.events.queues.QueueBroker;
-import info5.sar.events.queues.QueueBroker.AcceptListener;
+import info5.sar.utils.AcceptListener;
 
 /**
  * This is a simple echo server.
@@ -58,6 +59,12 @@ public class Server implements Runnable {
       System.out.println("Server: accepted connection from " + queue.getRemoteName());
       new ServerWorker(queue);
     }
+
+	@Override
+	public void accepted(Channel channel) {
+		// TODO Auto-generated method stub
+		
+	}
   }
 
   /**

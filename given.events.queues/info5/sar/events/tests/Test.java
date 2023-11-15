@@ -195,7 +195,8 @@ public class Test {
     waitForClients();
   }
 
-  private void waitForClients() {
+  @SuppressWarnings("unused")
+private void waitForClients() {
     while (true) {
       int nclients = 0;
       for (int i = 0; i < m_clients.length; i++) {

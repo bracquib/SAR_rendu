@@ -17,7 +17,16 @@
 package info5.sar.events.queues;
 
 public abstract class MessageQueue {
-  abstract public QueueBroker broker();
+  protected QueueBroker broker;
+
+    public MessageQueue(QueueBroker broker) {
+        this.broker = broker;
+    }
+    public MessageQueue() {
+	}
+    
+
+   abstract public QueueBroker broker();
 
   // added to help debug applications;
   public abstract String getRemoteName();

@@ -16,42 +16,54 @@
  */
 package info5.sar.events.queues;
 
+import info5.sar.events.channels.Channel;
+
 /**
- * This is for the full event-oriented implementation, 
- * using a single event pump (Executor).
- * You must specify, design, and code the event-oriented
- * version of the channels and their brokers.
+ * This is for the full event-oriented implementation, using a single event pump
+ * (Executor). You must specify, design, and code the event-oriented version of
+ * the channels and their brokers.
  */
 public class CMessageQueue extends MessageQueue {
+	protected Channel channel;
+	protected Listener listener;
 
-  @Override
-  public QueueBroker broker() {
-    throw new RuntimeException("Not Implemented Yet");
-  }
+	private WriterReaderAutomata automata;
 
-  @Override
-  public void setListener(Listener l) {
-    throw new RuntimeException("Not Implemented Yet");
-  }
+    protected CMessageQueue(QueueBroker broker, Channel channel) {
+		super(broker);
+        this.channel = channel;
+        this.automata = new WriterReaderAutomata(this);
+    }
 
-  @Override
-  public boolean send(byte[] bytes) {
-    throw new RuntimeException("Not Implemented Yet");
-  }
+	@Override
+	public QueueBroker broker() {
+		return broker;
+	}
 
-  @Override
-  public void close() {
-    throw new RuntimeException("Not Implemented Yet");
-  }
+	@Override
+	public void setListener(Listener l) {
+		this.listener = l;
+		automata.start();
+	}
 
-  @Override
-  public boolean closed() {
-    throw new RuntimeException("Not Implemented Yet");
-  }
+	@Override
+	public boolean send(byte[] bytes) {
+		return automata.write(bytes);
+	}
 
-  @Override
-  public String getRemoteName() {
-    throw new RuntimeException("Not Implemented Yet");
-  }
+	@Override
+	public void close() {
+		channel.close();
+	}
+
+	@Override
+	public boolean closed() {
+		return channel.closed();
+	}
+
+	@Override
+	public String getRemoteName() {
+		return channel.getRemoteName();
+	}
 
 }

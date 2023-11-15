@@ -16,7 +16,11 @@
  */
 package info5.sar.events.queues;
 
-import info5.sar.channels.Broker;
+import info5.sar.events.channels.Broker;
+import info5.sar.events.channels.Channel;
+import info5.sar.events.queues.MessageQueue;
+import info5.sar.utils.AcceptListener;
+import info5.sar.utils.ConnectListener;
 import info5.sar.utils.Executor;
 
 /**
@@ -27,14 +31,25 @@ import info5.sar.utils.Executor;
  */
 public class CQueueBroker extends QueueBroker {
 
-  public CQueueBroker(Executor pump, Broker broker) {
-    super(pump,broker);
-    throw new RuntimeException("Not Implemented Yet");
+  public CQueueBroker(Broker broker, Executor executor) {
+    super(broker, executor);
   }
 
   @Override
   public boolean bind(int port, AcceptListener listener) {
-    throw new RuntimeException("Not Implemented Yet");
+    QueueBroker broker = this;
+    return broker.bind(port, new AcceptListener() {
+      @Override
+      public void accepted(Channel channel) {
+        listener.accepted(new CMessageQueue(broker, channel));
+      }
+
+	@Override
+	public void accepted(MessageQueue queue) {
+		// TODO Auto-generated method stub
+		
+	}
+    });
   }
 
   @Override

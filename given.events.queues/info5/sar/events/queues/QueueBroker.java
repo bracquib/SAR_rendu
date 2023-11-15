@@ -16,18 +16,25 @@
  */
 package info5.sar.events.queues;
 
-import info5.sar.channels.Broker;
 import info5.sar.utils.Executor;
+import info5.sar.events.channels.Broker;
+import info5.sar.utils.AcceptListener;
+import info5.sar.utils.ConnectListener;
+
 
 public abstract class QueueBroker {
-  public Broker broker;
-  protected Executor pump;
-  public QueueBroker(Executor pump, Broker broker) {
+  protected Broker broker;
+  protected Executor executor;
+  
+  public QueueBroker(Broker broker, Executor executor) {
     this.broker = broker;
-    this.pump = pump;
+    this.executor = executor;
   }
 
-  public Executor getEventPump() { return pump; }
+public Executor getExecutor() {
+    return executor;
+  }
+  
   public String getName() {
     return broker.getName();
   }
@@ -36,20 +43,14 @@ public abstract class QueueBroker {
     return broker;
   }
 
-  public interface AcceptListener {
-    void accepted(MessageQueue queue);
-  }
-
   public abstract boolean bind(int port, AcceptListener listener);
 
   public abstract boolean unbind(int port);
 
-  public interface ConnectListener {
-    void connected(MessageQueue queue);
-
-    void refused();
-  }
-
   public abstract boolean connect(String name, int port, ConnectListener listener);
+
+public Executor getEventPump() {
+	return executor;
+}
 
 }
