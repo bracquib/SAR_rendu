@@ -36,48 +36,49 @@ public class WriterReaderAutomata {
 		Channel channel = queue.channel;
 
 		WriterReaderListener writeReaderListener = new WriterReaderListener() {
+
 			int remaining = Integer.BYTES;
 
 			@Override
-			public void read(int bytes) {
-				remaining -= bytes;
+			public void read(int x) {
 
-				switch (state) {
-				case READ_SIZE:
+				remaining -= x;
+
+				if (state == State.READ_SIZE) {
 					if (remaining > 0) {
 						try {
-							channel.read(buffer, buffer.length - remaining, remaining, this);
+							channel.read(buffer, (buffer.length - remaining), remaining, this);
 						} catch (ClosedException e) {
-							// TODO: handle exception
 							listener.closed();
 						}
-					} else {
-						ByteBuffer buffer2 = ByteBuffer.wrap(buffer);
-						int size = buffer2.getInt();
-						remaining = size;
-						buffer = new byte[size];
 
+					} else {
+						ByteBuffer buffer1 = ByteBuffer.wrap(buffer);
+						int size = buffer1.getInt();
+						buffer = new byte[size];
+						remaining = size;
+						state = State.READ_CONTENT;
 						try {
 							channel.read(buffer, 0, size, this);
 						} catch (ClosedException e) {
 							listener.closed();
 						}
+
 					}
-					break;
-				case READ_CONTENT:
+				} else if (state == State.READ_CONTENT) {
 					if (remaining > 0) {
 						try {
-							channel.read(buffer, buffer.length - remaining, remaining, this);
+							channel.read(buffer, (buffer.length - remaining), remaining, this);
 						} catch (ClosedException e) {
-							// TODO: handle exception
 							listener.closed();
 						}
-					} else {
-						listener.received(Arrays.copyOf(buffer, buffer.length));
-						remaining = Integer.BYTES;
-						buffer = new byte[Integer.BYTES];
-						state = State.READ_SIZE;
 
+					} else {
+						System.out.println("Taille du tableau a retourné : " + buffer.length);
+						listener.received(Arrays.copyOf(buffer, buffer.length));
+						buffer = new byte[Integer.BYTES];
+						remaining = Integer.BYTES;
+						state = State.READ_SIZE;
 						try {
 							channel.read(buffer, 0, remaining, this);
 						} catch (ClosedException e) {
@@ -85,80 +86,79 @@ public class WriterReaderAutomata {
 						}
 
 					}
-					break;
-				case WRITE_SIZE:
-				case WRITE_CONTENT:
-					break;
+
 				}
 			}
 
-			
-			public void write(int bytes) {
-				// TODO Auto-generated method stub
-
-			}
-		};
-
-		try {
-			channel.read(buffer, 0, Integer.BYTES, writeReaderListener);
-		} catch (ClosedException e) {
-			// nothing to do here
-		}
-
-	}
-
-	public boolean write(byte[] bytes){
-	    byte[] buffer2 = new byte[Integer.BYTES];
-	    ByteBuffer buffer3 = ByteBuffer.wrap(buffer2).putInt(bytes.length);
-	    buffer2 = buffer3.array();
-
-	    Listener listener = queue.listener;
-        Channel channel = queue.channel;
-
-        WriterReaderListener writeReaderListener = new WriterReaderListener() {
-			int remaining = Integer.BYTES;
-			State state = State.WRITE_SIZE;
-
-			
-			public void read(int bytes) {
-				// TODO Auto-generated method stub
-			}
 			@Override
 			public void write(int bytes) {
-				remaining -= bytes;
+				// TODO Auto-generated method stub
+				
+			}
+		};
+		try {
+			channel.read(buffer, 0, 4, writeReaderListener);
+		} catch (ClosedException e) {
+			// rine
+		}
+	}
 
-				switch (state) {
-                case WRITE_SIZE:
-                    if (remaining > 0) {
-                        try {
-                            channel.write(buffer, Integer.BYTES - remaining, remaining, this);
-                        } catch (ClosedException e) {
-							// nothing to do here
-                        }
-                    }
-                    break;
-                case WRITE_CONTENT:
-                    if (remaining > 0) {
-                        try {
-                            channel.write(buffer, buffer.length - remaining, remaining, this);
-                        } catch (ClosedException e) {
-							// nothing to do here
-                        }
-                    }
-                    break;
-                case READ_SIZE:
-                case READ_CONTENT:
-                    break;
-                }
-            }
-        };
+	public boolean write(byte[] bytes) {
+	    byte[] buffer2 = new byte[Integer.BYTES];
+	    ByteBuffer buffer3 = ByteBuffer.wrap(buffer2).putInt(bytes.length);
+	    final byte[] buffer4 = buffer3.array();
+	    Listener listener = queue.listener;
+	    Channel channel = queue.channel;
 
-        try {
-            channel.write(buffer2, 0, Integer.BYTES, writeReaderListener);
-        } catch (ClosedException e) {
-          // nothing to do here
-        }
+	    WriterReaderListener writeReaderListener = new WriterReaderListener() {
+	        int remaining = Integer.BYTES;
+	        State state = State.WRITE_SIZE;
 
-        return true;
-    }
+	        @Override
+	        public void write(int writtenBytes) {
+	            remaining -= writtenBytes;
+
+	            if (state == State.WRITE_CONTENT) {
+	                if (remaining > 0) {
+	                    try {
+	                        channel.write(bytes, (bytes.length - remaining), remaining, this);
+	                    } catch (ClosedException e) {
+	                        // Nothing to do here
+	                    }
+	                }
+	            } else if (state == State.WRITE_SIZE) {
+	                if (remaining > 0) {
+	                    try {
+	                        channel.write(buffer4, (Integer.BYTES - remaining), remaining, this);
+	                    } catch (ClosedException e) {
+	                        // Nothing to do here
+	                    }
+	                } else {
+	                    state = State.WRITE_CONTENT;
+	                    remaining = bytes.length;
+	                    try {
+	                        channel.write(bytes, (bytes.length - remaining), remaining, this);
+	                    } catch (ClosedException e) {
+	                        // Nothing to do here
+	                    }
+	                }
+	            }
+	        }
+
+	        @Override
+	        public void read(int bytesRead) {
+	            // TODO Auto-generated method stub
+
+	        }
+	    };
+
+	    try {
+	        channel.write(buffer4, 0, Integer.BYTES, writeReaderListener);
+	    } catch (ClosedException e) {
+	        // Nothing to do here
+	    }
+
+	    return true;
+	}
+
 }

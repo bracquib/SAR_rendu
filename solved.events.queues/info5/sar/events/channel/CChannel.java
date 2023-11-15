@@ -101,7 +101,7 @@ public class CChannel extends Channel {
 		
 
 	@Override
-	public boolean read(byte[] bytes, int offset, int length,WriterReaderListener listener) throws ClosedException {
+	public boolean read(byte[] bytes, int offset, int length, WriterReaderListener listener) throws ClosedException {
 		if (closed() || (remoteChannel.closed() && bufferRead.empty())) {
 			throw new ClosedException();
 		}
