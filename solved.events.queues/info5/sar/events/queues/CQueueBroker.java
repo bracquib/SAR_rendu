@@ -29,37 +29,34 @@ import info5.sar.utils.Executor;
  */
 public class CQueueBroker extends QueueBroker {
 
-  public CQueueBroker(Executor executor,Broker broker) {
+  public CQueueBroker(Executor executor,info5.sar.events.channels.Broker broker) {
     super(executor,broker);
+
   }
 
   @Override
   public boolean bind(int port, AcceptListener listener) {
-    QueueBroker broker = this;
-    return broker.bind(port, new AcceptListener() {
-      @Override
-      public void accepted(Channel channel) {
-        listener.accepted(new CMessageQueue(broker, channel));
-      }
-
-	@Override
-	public void accepted(MessageQueue queue) {
-		return broker.unbind(port);
+    QueueBroker self = this; 
+    return this.broker1.accept(port, new Broker.AcceptListener() {
 		
-	}
-    });
+    	@Override
+        public void accepted(Channel channel) {
+          listener.accepted(new CMessageQueue(self, channel));
+        }
+	});
+     
   }
 
   @Override
   public boolean unbind(int port) {
-	  return broker.unbind(port);
+	  return this.broker1.disconnect(port);
   }
 
   @Override
   public boolean connect(String name, int port, ConnectListener listener) {
-	  QueueBroker broker = this;
+	  QueueBroker self = this;
 	    
-	    return broker.connect(name, port, new Broker.ConnectListener() {
+	    return this.broker1.connect(name, port, new Broker.ConnectListener() {
 
 			@Override
 			public void connected(Channel queue) {
@@ -73,4 +70,3 @@ public class CQueueBroker extends QueueBroker {
   }
   }
 
-}

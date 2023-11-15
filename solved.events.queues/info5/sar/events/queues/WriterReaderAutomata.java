@@ -114,11 +114,11 @@ public class WriterReaderAutomata {
 
 	    Listener listener = queue.listener;
         Channel channel = queue.channel;
+		state = State.WRITE_SIZE;
 
         WriterReaderListener writeReaderListener = new WriterReaderListener() {
 			int remaining = Integer.BYTES;
 
-			state = State.WRITE_SIZE;
 
 			@Override
 			public void read(int bytes) {
