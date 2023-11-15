@@ -1,12 +1,10 @@
 package info5.sar.events.channel;
 
 import info5.sar.events.channels.Broker;
+import info5.sar.events.channels.Broker.ConnectListener;
 import info5.sar.events.channels.Channel;
-import info5.sar.utils.AcceptListener;
 import info5.sar.utils.Executor;
 import info5.sar.utils.BrokerManager;
-import info5.sar.utils.ConnectListener;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 

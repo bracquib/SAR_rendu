@@ -16,7 +16,9 @@
  */
 package info5.sar.events.queues;
 
-import info5.sar.channels.Broker;
+import info5.sar.events.channel.CChannel;
+import info5.sar.events.channels.Broker;
+import info5.sar.events.channels.Channel;
 import info5.sar.utils.Executor;
 
 /**
@@ -27,24 +29,48 @@ import info5.sar.utils.Executor;
  */
 public class CQueueBroker extends QueueBroker {
 
-  public CQueueBroker(Executor pump, Broker broker) {
-    super(pump,broker);
-    throw new RuntimeException("Not Implemented Yet");
+  public CQueueBroker(Executor executor,Broker broker) {
+    super(executor,broker);
   }
 
   @Override
   public boolean bind(int port, AcceptListener listener) {
-    throw new RuntimeException("Not Implemented Yet");
+    QueueBroker broker = this;
+    return broker.bind(port, new AcceptListener() {
+      @Override
+      public void accepted(Channel channel) {
+        listener.accepted(new CMessageQueue(broker, channel));
+      }
+
+	@Override
+	public void accepted(MessageQueue queue) {
+		return broker.unbind(port);
+		
+	}
+    });
   }
 
   @Override
   public boolean unbind(int port) {
-    throw new RuntimeException("Not Implemented Yet");
+	  return broker.unbind(port);
   }
 
   @Override
   public boolean connect(String name, int port, ConnectListener listener) {
-    throw new RuntimeException("Not Implemented Yet");
+	  QueueBroker broker = this;
+	    
+	    return broker.connect(name, port, new Broker.ConnectListener() {
+
+			@Override
+			public void connected(Channel queue) {
+				listener.connected(new CMessageQueue(self, (CChannel)queue));
+			}
+
+			@Override
+			public void refused() {
+				listener.refused();		
+			}});
+  }
   }
 
 }

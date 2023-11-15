@@ -22,10 +22,16 @@ import info5.sar.utils.Executor;
 public abstract class QueueBroker {
   public Broker broker;
   protected Executor pump;
+  public info5.sar.events.channels.Broker broker1;
+
   public QueueBroker(Executor pump, Broker broker) {
     this.broker = broker;
     this.pump = pump;
   }
+  public QueueBroker(Executor pump, info5.sar.events.channels.Broker broker) {
+	    this.broker1 = broker;
+	    this.pump = pump;
+	  }
 
   public Executor getEventPump() { return pump; }
   public String getName() {

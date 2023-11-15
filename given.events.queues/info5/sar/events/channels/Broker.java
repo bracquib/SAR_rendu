@@ -17,8 +17,7 @@
 package info5.sar.events.channels;
 
 
-import info5.sar.utils.AcceptListener;
-import info5.sar.utils.ConnectListener;
+
 import info5.sar.utils.Executor;
 
 /**
@@ -48,7 +47,15 @@ public abstract class Broker {
     this.executor = executor;
 
   }
+  public interface AcceptListener {
+		void accepted(Channel queue);
+	}
   
+  public interface ConnectListener {
+		void connected(Channel queue);
+
+		void refused();
+	}
   /*
    * @returns the name of this broker.
    */

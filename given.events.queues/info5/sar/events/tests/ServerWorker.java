@@ -124,4 +124,10 @@ public class ServerWorker implements MessageQueue.Listener {
     }
   }
 
+@Override
+public void received(Byte valueOf) {
+	// TODO Auto-generated method stub
+	
+}
+
 }

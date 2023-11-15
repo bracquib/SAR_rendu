@@ -18,13 +18,13 @@ package info5.sar.events.queues;
 
 public abstract class MessageQueue {
   abstract public QueueBroker broker();
-
   // added to help debug applications;
   public abstract String getRemoteName();
 
   public interface Listener {
     void received(byte[] msg);
     void closed();
+	void received(Byte valueOf);
   }
   public abstract void setListener(Listener l);
   

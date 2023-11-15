@@ -186,6 +186,12 @@ public class ClientSession implements Runnable, QueueBroker.ConnectListener {
       m_logger.logln(m_name + " done");
       done();
     }
+
+	@Override
+	public void received(Byte valueOf) {
+		// TODO Auto-generated method stub
+		
+	}
   }
 
   /**
