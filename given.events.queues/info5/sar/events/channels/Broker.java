@@ -32,8 +32,8 @@ import info5.sar.utils.Executor;
  * creating a new channel for each newly accepted connection.
  */
 public abstract class Broker {
-  String name;
-  Executor executor;
+  protected String name;
+  protected Executor executor;
   /* 
     * Creates a new broker with the given name and executor.
     * The executor is used to run the broker's threads.
@@ -47,6 +47,9 @@ public abstract class Broker {
     this.executor = executor;
 
   }
+  protected Broker(String name){
+	    this.name = name;
+	  }
   public interface AcceptListener {
 		void accepted(Channel queue);
 	}

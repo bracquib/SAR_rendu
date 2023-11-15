@@ -18,10 +18,11 @@ package info5.sar.events.tests;
 
 import java.lang.reflect.Constructor;
 
-import info5.sar.channels.Broker;
+//import info5.sar.channels.Broker;
 import info5.sar.events.queues.QueueBroker;
 import info5.sar.utils.Executor;
 import info5.sar.utils.Panic;
+import info5.sar.events.channels.Broker;
 
 /**
  * This test is a simple echo test based on a client-server architecture. The
@@ -68,8 +69,8 @@ public class Test {
     Panic.failStop(th);
   }
 
-  static String ChannelBrokerClassName = "info5.sar.channels.CBroker";
-  static String QueueBrokerClassName = "info5.sar.mixed.queues.CQueueBroker";
+  static String ChannelBrokerClassName = "info5.sar.events.channel.CBroker";
+  static String QueueBrokerClassName = "info5.sar.events.queues.CQueueBroker";
   static final String CBROKER_OPTION = "-cbroker:";
   static final String QBROKER_OPTION = "-qbroker:";
   static final String NCLIENTS_OPTION = "-nclients:";
@@ -116,8 +117,9 @@ public class Test {
   static private void loadBrokerClasses() throws Exception {
     if (cbroker_cls == null) {
       cbroker_cls = Class.forName(ChannelBrokerClassName);
-      Class params[] = new Class[1];
+      Class params[] = new Class[2];
       params[0] = String.class;
+      params[1] = Executor.class;
       cbroker_ctor = cbroker_cls.getConstructor(params);
     }
     if (qbroker_cls == null) {
@@ -244,12 +246,12 @@ public class Test {
    * both with the same name.
    */
   private QueueBroker newBrokers(String name) throws Exception {
-    Object[] args = new Object[] { name };
+    Object[] args = new Object[] { name, m_pump };
     Broker cb = (Broker) cbroker_ctor.newInstance(args);
     args = new Object[] { m_pump, cb };
     QueueBroker qb = (QueueBroker) qbroker_ctor.newInstance(args);
     return qb;
-  }
+}
 
   public static void writeInt(byte[] msg, int offset, int value) {
     msg[offset] = (byte) (value >>> 24);

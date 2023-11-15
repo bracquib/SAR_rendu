@@ -67,6 +67,7 @@ public class CChannel extends Channel {
 		}
 		if (remoteChannel.closed()){
 			listener.write(length);
+			System.out.println("write: remoteChannel closed and length = " + length);
 			return true;
 		}
 		
@@ -78,15 +79,18 @@ public class CChannel extends Channel {
 			public void run() {
 				if (bufferWrite.full()) {
 					remoteChannel.runnables.get("write").add(this);
+					System.out.println("write: bufferWrite full,ajout runnable");
 				}
 				else {
 					int wrote = 0;
 					while (!bufferWrite.full() && wrote < length) {
 						bufferWrite.push(bytes[offset + wrote++]);
 					}
+					System.out.println("write: bufferWrite not full, wrote = " + wrote);
 					listener.write(wrote);
 					while (!runnables.get("read").isEmpty()) {
 						executor.post(runnables.get("read").remove(0));
+						System.out.println("write: post read");
 					}
 				}
 			}
@@ -109,15 +113,18 @@ public class CChannel extends Channel {
 			public void run() {
 				if (bufferRead.empty()) {
 					remoteChannel.runnables.get("read").add(this);
+					System.out.println("read: bufferRead empty,ajout runnable");
 				}
 				else {
 					int read = 0;
 					while (!bufferRead.full() && read < length) {
 						bytes[offset + read++] = bufferRead.pull();
 					}
+					System.out.println("read: bufferRead not empty, read = " + read);
 					listener.read(read);
 					while (!runnables.get("write").isEmpty()) {
 						executor.post(runnables.get("write").remove(0));
+						System.out.println("read: post write");
 					}
 				}
 			}

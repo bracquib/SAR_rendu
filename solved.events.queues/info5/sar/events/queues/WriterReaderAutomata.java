@@ -92,7 +92,7 @@ public class WriterReaderAutomata {
 				}
 			}
 
-			@Override
+			
 			public void write(int bytes) {
 				// TODO Auto-generated method stub
 
@@ -114,17 +114,16 @@ public class WriterReaderAutomata {
 
 	    Listener listener = queue.listener;
         Channel channel = queue.channel;
-		state = State.WRITE_SIZE;
 
         WriterReaderListener writeReaderListener = new WriterReaderListener() {
 			int remaining = Integer.BYTES;
+			State state = State.WRITE_SIZE;
 
-
-			@Override
+			
 			public void read(int bytes) {
 				// TODO Auto-generated method stub
 			}
-
+			@Override
 			public void write(int bytes) {
 				remaining -= bytes;
 

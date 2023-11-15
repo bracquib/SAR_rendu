@@ -10,13 +10,15 @@ import java.util.HashMap;
 
 public class CBroker extends Broker {
 	private static final BrokerManager<CBroker> brokerManager = BrokerManager.getInstance(CBroker.class);
+	  protected Executor executor;
 
 	private HashMap<Integer, AcceptListener> ports = new HashMap<Integer, AcceptListener>();
 	private HashMap<Integer, ArrayList<BrokerWithListener>> brokerWithListenersWaitingForConnect = new HashMap<Integer, ArrayList<BrokerWithListener>>();
 	private HashMap<Integer, ArrayList<Channel>> channels = new HashMap<Integer, ArrayList<Channel>>();
 
-	protected CBroker(String name, Executor executor) {
-		super(name, executor);
+	public CBroker (String name, Executor executor) {
+		super(name,executor);
+		System.out.println("Creating CBroker with name: " + name);
 		try {
 			brokerManager.registerBroker(name, this);
 		} catch (Exception e) {
@@ -27,6 +29,7 @@ public class CBroker extends Broker {
 
 	@Override
 	public boolean accept(int port, AcceptListener listener) {
+		System.out.println("(entre dans accept:Accepting connection on port: " + port);
 		if (ports.containsKey(port)) {
 			return false;
 		}
@@ -57,7 +60,7 @@ public class CBroker extends Broker {
 								listener.accepted(channel);
 							}
 						};
-
+						System.out.println("accept: post connect");
 						executor.post(connect);
 					}
 					ports.remove(port);
@@ -70,6 +73,7 @@ public class CBroker extends Broker {
 
 	@Override
 	public boolean disconnect(int port) {
+		System.out.println("entre dans disconnect:Disconnecting from port: " + port);
 		if (!ports.containsKey(port)) {
 			return false;
 		}
@@ -92,6 +96,7 @@ public class CBroker extends Broker {
 
 	@Override
 	public boolean connect(String name, int port, ConnectListener listener) {
+		System.out.println("entre dans connect:Connecting to broker: " + name + " on port: " + port);
 		CBroker broker = this;
 		CBroker remoteBroker = brokerManager.getBroker(name);
 
@@ -118,6 +123,7 @@ public class CBroker extends Broker {
 							remotePorts.get(port).accepted(channel);
 						}
 					};
+					System.out.println("connect: post connect");
 					executor.post(connect2);
 				} else {
 					ArrayList<BrokerWithListener> brokerWithListeners = brokerWithListenersWaitingForConnect.get(port);
