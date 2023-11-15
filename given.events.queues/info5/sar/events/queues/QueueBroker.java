@@ -23,21 +23,23 @@ public abstract class QueueBroker {
   public Broker broker;
   protected Executor pump;
   public info5.sar.events.channels.Broker broker1;
-/*//must be commented because otherwise will not recuperate the event pump for full event
+//must be commented because otherwise will not recuperate the event pump for full event
   public QueueBroker(Executor pump, Broker broker) {
     this.broker = broker;
     this.pump = pump;
-  }*/
+  }
   public QueueBroker(Executor pump, info5.sar.events.channels.Broker broker) {
 	    this.broker1 = broker;
 	    this.pump = pump;
 	  }
 
   public Executor getEventPump() { return pump; }
-  public String getName() {
+ /* public String getName() {
     return broker1.getName();
-  }
-
+  }*/
+  public String getName() {
+	    return broker.getName();
+	  }
 
   public Broker getBroker() {
     return broker;
